@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <data>
+
+    <variable
+      name="student"
+      type="org.group9.stumgr.bean.Student" />
+  </data>
+
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <!-- 个人信息 开始 -->
+      <LinearLayout style="@style/digp">
+
+        <!-- 名字 开始 -->
+        <LinearLayout style="@style/di">
+
+          <TextView
+            style="@style/dt"
+            android:text="姓名：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.name}" />
+
+        </LinearLayout>
+        <!-- 名字 结束 -->
+
+        <!-- 电话 开始 -->
+        <LinearLayout style="@style/di">
+
+          <TextView
+            style="@style/dt"
+            android:text="电话：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.phoneNumber}" />
+        </LinearLayout>
+        <!-- 电话 结束 -->
+
+        <!-- 地址 开始 -->
+        <LinearLayout
+          style="@style/di"
+          android:orientation="horizontal">
+
+          <TextView
+            style="@style/dt"
+            android:text="地址：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.address}" />
+        </LinearLayout>
+        <!-- 地址 开始 -->
+
+      </LinearLayout>
+      <!-- 个人信息 结束 -->
+
+      <!-- 成绩 -->
+      <LinearLayout style="@style/digp">
+
+        <!-- 总成绩 -->
+        <LinearLayout
+          style="@style/di_lm"
+          android:orientation="vertical">
+
+          <TextView
+            style="@style/dt"
+            android:text="总成绩：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.displayTotalScore}" />
+
+        </LinearLayout>
+        <!-- 总成绩 结束 -->
+
+        <!-- 平时成绩 -->
+        <LinearLayout
+          style="@style/di_lm"
+          android:orientation="vertical">
+
+          <TextView
+            style="@style/dt"
+            android:text="平时成绩：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.displayNmScore}" />
+
+        </LinearLayout>
+        <!-- 平时成绩 结束 -->
+
+        <!-- 期末个人得分 -->
+        <LinearLayout
+          style="@style/di_lm"
+          android:orientation="vertical">
+
+          <TextView
+            style="@style/dt"
+            android:text="期末个人得分：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.displayEtIndividualScore}" />
+
+        </LinearLayout>
+        <!-- 期末个人得分 结束 -->
+
+        <!-- 期末成绩 -->
+        <LinearLayout
+          style="@style/di_lm"
+          android:orientation="vertical">
+
+          <TextView
+            style="@style/dt"
+            android:text="期末成绩：" />
+
+          <TextView
+            style="@style/dd"
+            android:text="@{student.displayEtScore}" />
+
+        </LinearLayout>
+        <!-- 期末成绩 结束 -->
+
+      </LinearLayout>
+
+    </LinearLayout>
+  </ScrollView>
+
+</layout>

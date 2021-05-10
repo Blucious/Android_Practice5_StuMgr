@@ -27,14 +27,16 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
 }
 
 dependencies {
     // Apache Commons
     implementation 'org.apache.commons:commons-lang3:3.6'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
     // Pinyin4j
     implementation group: 'com.belerweb', name: 'pinyin4j', version: '2.5.0'

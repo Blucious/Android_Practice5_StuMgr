@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <item
+    android:id="@+id/sortingMenuItem"
+    android:icon="@drawable/ic_baseline_sort_30"
+    android:title="排序"
+    app:showAsAction="always" />
+
+  <item
+    android:id="@+id/searchingMenuItem"
+    android:icon="@drawable/ic_baseline_search_30"
+    android:title="搜索"
+    app:showAsAction="always" />
+
+
+</menu>

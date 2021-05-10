@@ -1,22 +1,33 @@
 package org.group9.stumgr.bean;
 
-public class Student {
+import android.annotation.SuppressLint;
+
+import org.apache.commons.math3.util.Precision;
+
+import java.io.Serializable;
+
+public class Student implements Serializable {
    // 个人信息
    private String name;
    private String phoneNumber;
    private String address;
 
-   // 平时成绩
-   //   平时成绩不保存，而是通过计算得出
-   //   nm=Normal
+   /*
+    平时成绩、 期末成绩、个人得分不保存，而是通过计算得出
+    成绩计算方法：
+    总成绩=平时成绩*0.4+期末成绩*0.6，取值范围[0,100]
+      平时成绩=考勤*0.3+发言*0.2+演示*0.3+回答*0.2，取值范围[0,100]
+      期末成绩=项目得分*0.7+个人得分*0.3，取值范围[0,100]
+        个人得分=展示*0.6+提问*0.4，取值范围[0,100]
+    */
+
+   // 平时成绩，nm=Normal
    private Integer nmAttendanceScore;
    private Integer nmSpeakingScore;
    private Integer nmDemonstrationScore;
    private Integer nmAnswerScore;
 
-   // 期末成绩
-   //   期末成绩、个人得分不保存，而是通过计算得出
-   //   et=End of Term
+   // 期末成绩，et=End of Term
    private Integer etProjectScore;
    private Integer etDemonstrationScore;
    private Integer etAnswerScore;
@@ -29,17 +40,84 @@ public class Student {
       this.phoneNumber = phoneNumber;
    }
 
+   // ---------------- 辅助方法 开始 ----------------
+   public double roundScore(double score) {
+      return Precision.round(score, 2);
+   }
+   // ---------------- 辅助方法 结束 ----------------
+
    // ---------------- 计算型Getter 开始 ----------------
    public Double getNmScore() {
-      return 0.;
+      double r = nmAnswerScore * 0.3
+         + nmSpeakingScore * 0.2
+         + nmDemonstrationScore * 0.3
+         + nmAnswerScore * 0.2;
+      return roundScore(r);
+   }
+
+   @SuppressLint("DefaultLocale")
+   public String getDisplayNmScore() {
+      return String.format("%.2f\n" +
+            "=(考勤%d*0.3=%.1f)\n" +
+            "+(发言%d*0.2=%.1f)\n" +
+            "+(演示%d*0.3=%.1f)\n" +
+            "+(回答%d*0.2=%.1f)",
+         getNmScore(),
+         nmAnswerScore, nmAnswerScore * 0.3,
+         nmSpeakingScore, nmSpeakingScore * 0.2,
+         nmDemonstrationScore, nmDemonstrationScore * 0.3,
+         nmAnswerScore, nmAnswerScore * 0.2);
    }
 
    public Double getEtIndividualScore() {
-      return 0.;
+      double r = etDemonstrationScore * 0.6
+         + etAnswerScore * 0.4;
+      return roundScore(r);
+   }
+
+   @SuppressLint("DefaultLocale")
+   public String getDisplayEtIndividualScore() {
+      return String.format("%.2f\n" +
+            "=(展示%d*0.6=%.2f)\n" +
+            "+(提问%d*0.4=%.2f)",
+         getEtIndividualScore(),
+         etDemonstrationScore, etDemonstrationScore * 0.6,
+         etAnswerScore, etAnswerScore * 0.4);
    }
 
    public Double getEtScore() {
-      return 0.;
+      double r = etProjectScore * 0.7
+         + getEtIndividualScore() * 0.3;
+      return roundScore(r);
+   }
+
+   @SuppressLint("DefaultLocale")
+   public String getDisplayEtScore() {
+      Double etIndividualScore = getEtIndividualScore();
+      return String.format("%.2f\n" +
+            "=(项目得分%d*0.7=%.2f)\n" +
+            "+(个人得分%.2f*0.3=%.2f)",
+         getEtScore(),
+         etProjectScore, etDemonstrationScore * 0.7,
+         etIndividualScore, etIndividualScore * 0.3);
+   }
+
+   public Double getTotalScore() {
+      double r = getNmScore() * 0.4
+         + getEtScore() * 0.6;
+      return roundScore(r);
+   }
+
+   @SuppressLint("DefaultLocale")
+   public String getDisplayTotalScore() {
+      Double nmScore = getNmScore();
+      Double etScore = getEtScore();
+      return String.format("%.2f\n" +
+            "=(平时成绩%.2f*0.4=%.2f)\n" +
+            "+(期末成绩%.2f*0.6=%.2f)",
+         getTotalScore(),
+         nmScore, nmScore * 0.4,
+         etScore, etScore * 0.6);
    }
    // ---------------- 计算型Getter 结束 ----------------
 
@@ -129,13 +207,18 @@ public class Student {
       return "Student{" +
          "name='" + name + '\'' +
          ", phoneNumber='" + phoneNumber + '\'' +
+         ", address='" + address + '\'' +
          ", nmAttendanceScore=" + nmAttendanceScore +
          ", nmSpeakingScore=" + nmSpeakingScore +
          ", nmDemonstrationScore=" + nmDemonstrationScore +
          ", nmAnswerScore=" + nmAnswerScore +
          ", etProjectScore=" + etProjectScore +
          ", etDemonstrationScore=" + etDemonstrationScore +
-         ", etAnswerScore=" + etAnswerScore +
-         '}';
+         ", etAnswerScore=" + etAnswerScore
+         + ", getEtScore() = " + getEtScore()
+         + ", getEtIndividualScore() = " + getEtIndividualScore()
+         + ", getNmScore() = " + getNmScore()
+         + ", getTotalScore() = " + getTotalScore()
+         + '}';
    }
 }
