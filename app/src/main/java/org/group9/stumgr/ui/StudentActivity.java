@@ -1,11 +1,19 @@
 package org.group9.stumgr.ui;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +23,12 @@ import androidx.databinding.DataBindingUtil;
 import org.group9.stumgr.R;
 import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.databinding.ActivityStudentManagerBinding;
+import org.group9.stumgr.service.FileUtils;
+import org.group9.stumgr.service.PermissionManager;
 import org.group9.stumgr.service.StudentService;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +59,12 @@ public class StudentActivity extends AppCompatActivity {
          .collect(Collectors.toList());
    }
 
+   private void initDataByImport(List<Student> students) {
+      this.students = students;
+      studentNames = students.stream().map(Student::getName)
+              .collect(Collectors.toList());
+   }
+
    private void initView() {
       ArrayAdapter<Object> adapter = new ArrayAdapter<>(
          this, android.R.layout.simple_list_item_1,
@@ -68,6 +86,49 @@ public class StudentActivity extends AppCompatActivity {
 
    }
 
+/*
+* 获取文件选择器返回值
+* */
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+      super.onActivityResult(requestCode, resultCode, data);
+      if (resultCode == Activity.RESULT_OK) {//是否选择，没选择就不会继续
+         Uri data1 = data.getData();
+         File file = new File(FileUtils.getFilePathByUri(StudentActivity.this,data1));
+//         File file = UriToFile.trans(StudentActivity.this,data1);
+         List<Student> students = StudentService.importStuInfoByJson(file);
+         initDataByImport(students);
+         StudentFragment fragment = (StudentFragment) getSupportFragmentManager()
+                 .findFragmentById(R.id.stuInfoFragment);
+         fragment.setStudent(students.get(0));
+         initView();
+         Toast.makeText(StudentActivity.this,"成功导入"+students.size()+"条数据",Toast.LENGTH_LONG).show();
+
+
+
+      }
+   }
+
+//   @Override
+//   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//
+//      switch (requestCode) {
+//         case 1: {
+//            // If request is cancelled, the result arrays are empty.
+//            if (grantResults.length > 0
+//                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                  Toast.makeText(StudentActivity.this,"授权成功",Toast.LENGTH_LONG);
+//
+//            } else {
+//                  Toast.makeText(StudentActivity.this,"授权失败",Toast.LENGTH_LONG);
+//
+//            }
+//
+//         }
+//      }
+//
+//   }
+
 
    /* ---------------- 菜单相关 开始 ---------------- */
    @Override
@@ -78,6 +139,7 @@ public class StudentActivity extends AppCompatActivity {
       return super.onCreateOptionsMenu(menu);
    }
 
+   @SuppressLint("ShowToast")
    @Override
    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
       int id = item.getItemId();
@@ -88,7 +150,12 @@ public class StudentActivity extends AppCompatActivity {
       } else if (id == R.id.searchingMenuItem) {
          onSearchingOptionSelected(item);
 
-      } else {
+      }else if (id == R.id.exportM){
+         onExportMOptionSelected();
+      }else if (id == R.id.importM){
+         onImportMOptionSelected();
+
+      }else {
          return super.onOptionsItemSelected(item);
       }
 
@@ -103,5 +170,31 @@ public class StudentActivity extends AppCompatActivity {
 
    }
 
-   /* ---------------- 菜单相关 结束 ---------------- */
+   public void onExportMOptionSelected(){
+      try {
+         boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentActivity.this, this);
+            String path = StudentService.exportStuInfoByJson(StudentActivity.this, students);
+            Toast.makeText(StudentActivity.this,"成功导出至"+path,Toast.LENGTH_LONG).show();
+            Log.d(TAG, "onOptionsItemSelected: "+path);
+
+
+      } catch (FileNotFoundException e) {
+         e.printStackTrace();
+      }
+   }
+
+   public void onImportMOptionSelected(){
+      boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentActivity.this, this);
+
+         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+         intent.setType("*/*");
+         intent.addCategory(Intent.CATEGORY_OPENABLE);
+         startActivityForResult(intent, 1);
+
+//      RequestPermissionRImpl.RequestPermissionAndroidR(StudentActivity.this);
+
+   }
+
+
+      /* ---------------- 菜单相关 结束 ---------------- */
 }

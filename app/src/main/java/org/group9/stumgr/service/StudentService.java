@@ -1,14 +1,31 @@
 package org.group9.stumgr.service;
 
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
+import android.os.Environment;
+import android.util.Log;
+
+
+import com.alibaba.fastjson.JSONArray;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.bean.StudentCriteria;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class StudentService {
@@ -121,5 +138,65 @@ public class StudentService {
             break;
       }
    }
+
+   public static List<Student> importStuInfoByJson(File file){
+      List<Student> students = null;
+      Log.d("TAG", "importStuInfoByJson: "+file.getPath());
+
+
+      StringBuilder jsoncontent = new StringBuilder();
+      try {
+         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+         String s = null;
+         while ((s = br.readLine()) != null) {
+            jsoncontent.append(System.lineSeparator() + s);
+         }
+         br.close();
+
+         Log.d("TAG", "importStuInfoByJson: "+jsoncontent);
+
+          students = JSONArray.parseArray(jsoncontent.toString(), Student.class);
+
+         Log.d("TAG", "importStuInfoByJson: "+students);
+         
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      
+      return students;
+      
+         
+   }
+
+   public static String exportStuInfoByJson(Context context, List<Student> students) throws FileNotFoundException {
+      Date date = new Date();
+      DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmSS");
+
+      File file =new File(Environment.getExternalStorageDirectory().getPath()+File.separator,"info"+ dateFormat.format(date) +".json");
+      FileOutputStream FileOutputStream = new FileOutputStream(file);
+      //创建json集合
+      JSONArray jsonArray =  new JSONArray();
+      for (Student s:students
+      ) {
+         jsonArray.add(s);
+      }
+
+      try {
+         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(FileOutputStream);
+         outputStreamWriter.write(jsonArray.toJSONString());
+         outputStreamWriter.flush();
+         outputStreamWriter.close();
+         FileOutputStream.close();
+         Log.d("save", "exportStuInfoByJson: success");
+
+      }catch (Exception e){
+         e.printStackTrace();
+      }
+
+      Log.d("TAG", "exportStuInfoByJson: "+jsonArray.toJSONString());
+
+      return file.getPath();
+   }
+
 
 }
