@@ -3,7 +3,6 @@ package org.group9.stumgr.service;
 
 import android.content.res.Resources;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.bean.StudentCriteria;
 
@@ -53,9 +52,9 @@ public class StudentService {
    }
 
    /**
-    * 排序方法定义
+    * 排序类型定义
     */
-   public enum SortingMethods {
+   public enum SortingType {
       DEFAULT("默认"),
       NAME_ASC("名字升序"),
       NAME_DESC("名字降序"),
@@ -66,32 +65,32 @@ public class StudentService {
       NORMAL_SCORE_AESC("平时成绩升序"),
       NORMAL_SCORE_DESC("平时成绩降序");
 
-      private String name;
+      public final String name;
 
-      SortingMethods(String name) {
+      SortingType(String name) {
          this.name = name;
       }
    }
 
-   public final static String[] sortingMethodNames;
+   public final static String[] SORTING_METHOD_NAMES;
 
    static {
-      sortingMethodNames = Arrays.stream(SortingMethods.values())
+      SORTING_METHOD_NAMES = Arrays.stream(SortingType.values())
          .map(e -> e.name)
          .toArray(String[]::new);
    }
 
    public static void sort(List<Student> students,
                            int sortingMethodIndex) {
-      sort(students, SortingMethods.values()[sortingMethodIndex]);
+      sort(students, SortingType.values()[sortingMethodIndex]);
    }
 
    /**
     * 根据 {@code sortingMethods} 对学生列表进行原地排序
     */
    public static void sort(List<Student> students,
-                           SortingMethods sortingMethods) {
-      switch (sortingMethods) {
+                           SortingType sortingType) {
+      switch (sortingType) {
          default:
          case DEFAULT:
             break;

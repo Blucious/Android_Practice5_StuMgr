@@ -3,9 +3,6 @@
 
   <data>
 
-    <variable
-      name="test"
-      type="int" />
   </data>
 
   <LinearLayout
@@ -13,20 +10,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <!-- 搜索相关 开始 -->
     <LinearLayout
+      android:id="@+id/searchViewWrapper"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="vertical">
+      android:orientation="vertical"
+      android:visibility="gone">
 
       <SearchView
+        android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
         android:padding="6dp"
-        android:queryHint="搜索学生">
-
-      </SearchView>
+        android:paddingHorizontal="12dp"
+        android:queryHint="搜索学生" />
 
       <View style="@style/sep_h" />
 
@@ -39,8 +39,8 @@
       android:layout_height="match_parent"
       android:orientation="horizontal">
 
-      <ListView
-        android:id="@+id/stuList"
+      <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/studentRecyclerView"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.25" />
