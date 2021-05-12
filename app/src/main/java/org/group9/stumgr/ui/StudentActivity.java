@@ -58,7 +58,7 @@ public class StudentActivity extends AppCompatActivity {
       studentNames = students.stream().map(Student::getName)
          .collect(Collectors.toList());
    }
-
+//导入后重新刷新列表
    private void initDataByImport(List<Student> students) {
       this.students = students;
       studentNames = students.stream().map(Student::getName)
@@ -87,7 +87,7 @@ public class StudentActivity extends AppCompatActivity {
    }
 
 /*
-* 获取文件选择器返回值
+* 获取文件选择器返回值 将json转化为java对象
 * */
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -109,25 +109,7 @@ public class StudentActivity extends AppCompatActivity {
       }
    }
 
-//   @Override
-//   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//
-//      switch (requestCode) {
-//         case 1: {
-//            // If request is cancelled, the result arrays are empty.
-//            if (grantResults.length > 0
-//                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                  Toast.makeText(StudentActivity.this,"授权成功",Toast.LENGTH_LONG);
-//
-//            } else {
-//                  Toast.makeText(StudentActivity.this,"授权失败",Toast.LENGTH_LONG);
-//
-//            }
-//
-//         }
-//      }
-//
-//   }
+
 
 
    /* ---------------- 菜单相关 开始 ---------------- */
@@ -173,6 +155,7 @@ public class StudentActivity extends AppCompatActivity {
    public void onExportMOptionSelected(){
       try {
          boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentActivity.this, this);
+
             String path = StudentService.exportStuInfoByJson(StudentActivity.this, students);
             Toast.makeText(StudentActivity.this,"成功导出至"+path,Toast.LENGTH_LONG).show();
             Log.d(TAG, "onOptionsItemSelected: "+path);

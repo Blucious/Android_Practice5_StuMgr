@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
+//利用反射解析sdk找到对应的实现类
 public abstract class PlatformSupportManager<T>
 {
 

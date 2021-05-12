@@ -9,7 +9,7 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-
+//安卓p授权实现类
 public class RequestPermissionPImpl implements RequestPermissionInterface{
     @TargetApi(9)
     @Override

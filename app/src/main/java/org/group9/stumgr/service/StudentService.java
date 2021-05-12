@@ -138,7 +138,7 @@ public class StudentService {
             break;
       }
    }
-
+//导入操作
    public static List<Student> importStuInfoByJson(File file){
       List<Student> students = null;
       Log.d("TAG", "importStuInfoByJson: "+file.getPath());
@@ -167,7 +167,7 @@ public class StudentService {
       
          
    }
-
+   //导出操作
    public static String exportStuInfoByJson(Context context, List<Student> students) throws FileNotFoundException {
       Date date = new Date();
       DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmSS");

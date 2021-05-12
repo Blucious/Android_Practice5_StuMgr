@@ -11,7 +11,7 @@ import android.provider.Settings;
 import androidx.annotation.RequiresApi;
 
 public class RequestPermissionRImpl implements RequestPermissionInterface{
-    // Andriod R
+    // Andriod R 授权实现类
     @RequiresApi(api = Build.VERSION_CODES.R)
     @TargetApi(11)
     public boolean RequestPermission(Context context, Activity activity){
