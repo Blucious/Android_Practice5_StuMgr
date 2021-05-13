@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,10 +58,10 @@ public class StudentService {
 
       StringBuilder jsoncontent = new StringBuilder();
       try {
-         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
          String s = null;
          while ((s = br.readLine()) != null) {
-            jsoncontent.append(System.lineSeparator() + s);
+            jsoncontent.append(System.lineSeparator()).append(s);
          }
          br.close();
 
@@ -85,20 +86,19 @@ public class StudentService {
       DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmSS");
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator, "info" + dateFormat.format(date) + ".json");
-      FileOutputStream FileOutputStream = new FileOutputStream(file);
+      FileOutputStream fileOutputStream = new FileOutputStream(file);
       //创建json集合
       JSONArray jsonArray = new JSONArray();
-      for (Student s : students
-      ) {
+      for (Student s : students) {
          jsonArray.add(s);
       }
 
       try {
-         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(FileOutputStream);
+         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
          outputStreamWriter.write(jsonArray.toJSONString());
          outputStreamWriter.flush();
          outputStreamWriter.close();
-         FileOutputStream.close();
+         fileOutputStream.close();
          Log.d("save", "exportStuInfoByJson: success");
 
       } catch (Exception e) {
@@ -141,8 +141,8 @@ public class StudentService {
       TOTAL_SCORE_ASC("总成绩升序"),
       TOTAL_SCORE_DESC("总成绩降序"),
       END_OF_TERM_SCORE_ASC("期末成绩升序"),
-      END_OF_TERM_SCORE_DASC("期末成绩降序"),
-      NORMAL_SCORE_AESC("平时成绩升序"),
+      END_OF_TERM_SCORE_DESC("期末成绩降序"),
+      NORMAL_SCORE_ASC("平时成绩升序"),
       NORMAL_SCORE_DESC("平时成绩降序");
 
       public final String name;
@@ -189,10 +189,10 @@ public class StudentService {
          case END_OF_TERM_SCORE_ASC:
             students.sort((a, b) -> a.getEtScore().compareTo(b.getEtScore()));
             break;
-         case END_OF_TERM_SCORE_DASC:
+         case END_OF_TERM_SCORE_DESC:
             students.sort((a, b) -> b.getEtScore().compareTo(a.getEtScore()));
             break;
-         case NORMAL_SCORE_AESC:
+         case NORMAL_SCORE_ASC:
             students.sort((a, b) -> a.getNmScore().compareTo(b.getNmScore()));
             break;
          case NORMAL_SCORE_DESC:

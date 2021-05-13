@@ -75,7 +75,7 @@ public class StudentGenerator {
       stu.setAddress(genAddress());
       // 成绩
       if (Math.random() > 0.81) {
-         if (Math.random() > 0.5) {
+         if (Math.random() > 0.65) {
             setScores(stu, () -> 100);
          } else {
             setScores(stu, () -> 80);

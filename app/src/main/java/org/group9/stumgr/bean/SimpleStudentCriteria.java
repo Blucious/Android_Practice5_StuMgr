@@ -15,12 +15,11 @@ public class SimpleStudentCriteria extends StudentCriteria {
     * 名字过滤相关字段
     *
     * 辅助字段 {@code studentNamePinyinDataCache}学生名拼音数据缓存。
-    * 若如果外部没有适时用clearCache，则会造成内存泄漏。
     */
    private String nameFragment = null;
    private boolean isNameFragmentContainsChnChar = false;
+   private int studentNamePinyinDataCacheMaxCount = 1000;
    private Map<String, StudentNamePinyinData> studentNamePinyinDataCache = new HashMap<>();
-   private int studentNamePinyinDataCacheMaxCount = 2000;
 
    private static class StudentNamePinyinData {
       private boolean isNameContainsChnChar;
@@ -52,6 +51,17 @@ public class SimpleStudentCriteria extends StudentCriteria {
       if (studentNamePinyinDataCache.size() > studentNamePinyinDataCacheMaxCount) {
          clearPinyinCache();
       }
+   }
+
+   public int getStudentNamePinyinDataCacheMaxCount() {
+      return studentNamePinyinDataCacheMaxCount;
+   }
+
+   public void setStudentNamePinyinDataCacheMaxCount(int maxCount) {
+      if (maxCount < 0) {
+         maxCount = 0;
+      }
+      this.studentNamePinyinDataCacheMaxCount = maxCount;
    }
 
    /**

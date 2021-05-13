@@ -154,7 +154,7 @@ public class StudentActivity extends AppCompatActivity {
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-      if (requestCode == UIConstants.RC_GET_CONTENT) {
+      if (requestCode == UIConstants.REQ_CODE_GET_CONTENT) {
          if (resultCode == Activity.RESULT_OK) { //是否选择，没选择就不会继续
             Uri data1 = data.getData();
             File file = new File(FileUtils.getFilePathByUri(StudentActivity.this, data1));
@@ -264,7 +264,7 @@ public class StudentActivity extends AppCompatActivity {
       Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
       intent.setType("*/*");
       intent.addCategory(Intent.CATEGORY_OPENABLE);
-      startActivityForResult(intent, UIConstants.RC_GET_CONTENT);
+      startActivityForResult(intent, UIConstants.REQ_CODE_GET_CONTENT);
 
 //      RequestPermissionRImpl.RequestPermissionAndroidR(StudentActivity.this);
 
