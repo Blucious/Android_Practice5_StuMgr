@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -22,16 +21,16 @@ import org.group9.stumgr.databinding.ActivityStudentManagerBinding;
 import org.group9.stumgr.service.StudentService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StudentActivity extends AppCompatActivity {
    private static final String TAG = StudentActivity.class.getSimpleName();
 
+
+   private List<Student> students;
+
    private ActivityStudentManagerBinding bd;
    private RecyclerView studentsRecyclerView;
    private StudentsAdapter studentsAdapter;
-
-   private List<Student> students;
 
    @Override
    protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,11 +45,12 @@ public class StudentActivity extends AppCompatActivity {
    }
 
    private void initData() {
-      students = StudentService.getRandomStudentsAsList(getResources(), 150);
+      students = StudentService.getRandomStudentsAsList(getResources(), 75);
    }
 
    private void initView() {
 
+      // 搜索框相关
       bd.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
          @Override
          public boolean onQueryTextSubmit(String query) {
@@ -61,11 +61,12 @@ public class StudentActivity extends AppCompatActivity {
          public boolean onQueryTextChange(String newText) {
             String nameFragment = newText != null ? newText : "";
             studentsAdapter.getStudentCriteria().setNameFragment(nameFragment);
-            updateList();
+            updateStudentList();
             return true;
          }
       });
 
+      // 学生列表相关
       {
          studentsAdapter = new StudentsAdapter(this, students, new StudentsAdapter.ViewOnClickListener() {
             @Override
@@ -80,7 +81,9 @@ public class StudentActivity extends AppCompatActivity {
          // DataBinding找不到这个id，原因不明。故手动findViewById
          studentsRecyclerView = bd.getRoot().findViewById(R.id.studentRecyclerView);
 
+         // 设置布局管理器
          studentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+         // 添加分割线装饰
          DividerItemDecoration did = new DividerItemDecoration(
             studentsRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
          studentsRecyclerView.addItemDecoration(did);
@@ -91,7 +94,7 @@ public class StudentActivity extends AppCompatActivity {
 
    }
 
-   private void updateList() {
+   private void updateStudentList() {
       studentsAdapter.notifyConditionChanged();
       studentsRecyclerView.scrollToPosition(0);
    }
@@ -134,7 +137,7 @@ public class StudentActivity extends AppCompatActivity {
          .setPositiveButton("关闭", (dialog, which) -> dialog.dismiss())
          .setOnDismissListener(dialog -> {
             if (prevSortingTypeIndex != studentsAdapter.getSortingTypeIndex()) {
-               updateList();
+               updateStudentList();
             }
          })
          .create();
@@ -145,12 +148,16 @@ public class StudentActivity extends AppCompatActivity {
    public void onSearchingOptionSelected(@NonNull MenuItem item) {
 
       if (bd.searchViewWrapper.getVisibility() == View.GONE) {
+         // 显示搜索视图时，调用onActionViewExpanded，以展开SearchView
          bd.searchView.onActionViewExpanded();
+
          bd.searchViewWrapper.setVisibility(View.VISIBLE);
          item.setIcon(R.drawable.ic_baseline_search_off_30);
 
       } else {
+         // 隐藏搜索视图时，调用onActionViewCollapsed，以清空SearchView内的文字
          bd.searchView.onActionViewCollapsed();
+
          bd.searchViewWrapper.setVisibility(View.GONE);
          item.setIcon(R.drawable.ic_baseline_search_30);
       }

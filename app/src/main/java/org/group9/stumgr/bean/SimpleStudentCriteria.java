@@ -6,27 +6,26 @@ import org.group9.stumgr.util.ChnCharUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 学生过滤条件实现类
+ */
 public class SimpleStudentCriteria extends StudentCriteria {
 
    /**
     * 名字过滤相关字段
+    *
+    * 辅助字段 {@code studentNamePinyinDataCache}学生名拼音数据缓存。
+    * 若如果外部没有适时用clearCache，则会造成内存泄漏。
     */
-   private String nameFragment;
-   private boolean isNameFragmentContainsChnChar;
-   // 有内存泄漏风险，如果外部没有及时调用clearCache
-   private Map<String, StudentNamePinyinData> studentNamePinyinDataCache;
+   private String nameFragment = null;
+   private boolean isNameFragmentContainsChnChar = false;
+   private Map<String, StudentNamePinyinData> studentNamePinyinDataCache = new HashMap<>();
+   private int studentNamePinyinDataCacheMaxCount = 2000;
 
    private static class StudentNamePinyinData {
       private boolean isNameContainsChnChar;
       private String pinyinalizedName;
       private Character[][] pinyinFirstSpellGroups;
-   }
-
-   public SimpleStudentCriteria setDefault() {
-      nameFragment = null;
-      isNameFragmentContainsChnChar = false;
-      studentNamePinyinDataCache = new HashMap<>();
-      return this;
    }
 
    public String getNameFragment() {
@@ -42,9 +41,14 @@ public class SimpleStudentCriteria extends StudentCriteria {
          isNameFragmentContainsChnChar = false;
       }
    }
-
    public void clearPinyinCache() {
       studentNamePinyinDataCache = new HashMap<>();
+   }
+
+   private void tryReducePinyinCache() {
+      if (studentNamePinyinDataCache.size() > studentNamePinyinDataCacheMaxCount) {
+         clearPinyinCache();
+      }
    }
 
    public StudentNamePinyinData getPinyinDataForName(String name) {
@@ -58,6 +62,9 @@ public class SimpleStudentCriteria extends StudentCriteria {
          }
          studentNamePinyinDataCache.put(name, data);
       }
+
+      tryReducePinyinCache();
+
       return data;
    }
 

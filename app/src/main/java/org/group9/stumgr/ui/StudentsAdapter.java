@@ -26,13 +26,24 @@ public class StudentsAdapter
    private final Activity activity;
    private final LayoutInflater layoutInflater;
 
+   /**
+    * {@code students}外部传入的完整的学生列表
+    * {@code filteredStudents}根据{@code studentCriteria}过滤、根据{@code sortingTypeIndex}排序后的学生列表
+    */
    private List<Student> students = Collections.emptyList();
    private List<Student> filteredStudents = Collections.emptyList();
-   private SimpleStudentCriteria studentCriteria = new SimpleStudentCriteria().setDefault();
+   private SimpleStudentCriteria studentCriteria = new SimpleStudentCriteria();
    private int sortingTypeIndex = 0;
 
+   /**
+    * 保存外部传入的监听器
+    */
    private ViewOnClickListener listener;
 
+   /**
+    * 创建一个只有一个线程的线程池，来执行过滤和排序等操作。
+    * 以避免在UI线程进行重计算操作。
+    */
    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
    public StudentsAdapter(Activity activity, List<Student> students,
@@ -58,7 +69,7 @@ public class StudentsAdapter
 
    public void setStudentCriteria(SimpleStudentCriteria studentCriteria) {
       if (studentCriteria == null) {
-         studentCriteria = new SimpleStudentCriteria().setDefault();
+         studentCriteria = new SimpleStudentCriteria();
       }
       this.studentCriteria = studentCriteria;
    }
@@ -68,19 +79,20 @@ public class StudentsAdapter
          students = Collections.emptyList();
       }
       this.students = students;
+      // 清除为旧学生列表所建立的缓存
       studentCriteria.clearPinyinCache();
    }
 
    /**
-    * 通知该适配器情况发生变化，即学生列表、排序方式和过滤条件中其一或其中多个发生变化
+    * 通知该适配器情况发生变化（学生列表、排序方式和过滤条件中其一或其中多个发生变化）
     */
    public void notifyConditionChanged() {
-      doFilterAndSort();
-      notifyDataSetChanged();
-      //executorService.submit(() -> {
-      //   activity.runOnUiThread(() -> {
-      //   });
-      //});
+      executorService.submit(() -> {
+         doFilterAndSort();
+         activity.runOnUiThread(() -> {
+            notifyDataSetChanged();
+         });
+      });
    }
 
    private void doFilterAndSort() {
