@@ -1,4 +1,4 @@
-package org.group9.stumgr.util.android;
+package org.group9.stumgr.service;
 
 import android.os.Build;
 

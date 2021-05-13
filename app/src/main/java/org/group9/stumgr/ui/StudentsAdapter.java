@@ -27,8 +27,9 @@ public class StudentsAdapter
    private final LayoutInflater layoutInflater;
 
    /**
-    * {@code students}外部传入的完整的学生列表
-    * {@code filteredStudents}根据{@code studentCriteria}过滤、根据{@code sortingTypeIndex}排序后的学生列表
+    * {@code students}：外部传入的完整的学生列表
+    * {@code filteredStudents}：根据{@code studentCriteria}过滤、
+    *   根据{@code sortingTypeIndex}排序后的学生列表
     */
    private List<Student> students = Collections.emptyList();
    private List<Student> filteredStudents = Collections.emptyList();

@@ -1,4 +1,4 @@
-package org.group9.stumgr.util.android;
+package org.group9.stumgr.util;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;

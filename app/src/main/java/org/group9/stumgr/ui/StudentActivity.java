@@ -24,8 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.group9.stumgr.R;
 import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.databinding.ActivityStudentManagerBinding;
-import org.group9.stumgr.util.android.FileUtils;
-import org.group9.stumgr.util.android.PermissionManager;
+import org.group9.stumgr.util.FileUtils;
+import org.group9.stumgr.service.PermissionManager;
 import org.group9.stumgr.service.StudentService;
 
 import java.io.File;
@@ -57,7 +57,7 @@ public class StudentActivity extends AppCompatActivity {
 
    private void initData() {
       setStudentsSafely(
-         StudentService.getRandomStudentsAsList(getResources(), 10)
+         StudentService.getRandomStudentsAsList(getResources(), 25)
       );
    }
 
@@ -161,7 +161,6 @@ public class StudentActivity extends AppCompatActivity {
 //          File file = UriToFile.trans(StudentActivity.this,data1);
             List<Student> newStudents = StudentService.importStuInfoByJson(file);
             // 导入后重新刷新列表
-            System.out.println(newStudents);
             setStudentsSafely(newStudents);
             notifyConditionChanged();
 
