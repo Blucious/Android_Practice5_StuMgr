@@ -1,3 +1,5 @@
 <resources>
   <string name="app_name">G9StuMgr</string>
+  <string name="importInfo">导入学生信息</string>
+  <string name="exportInfo">导出学生信息</string>
 </resources>

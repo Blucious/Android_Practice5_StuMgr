@@ -84,13 +84,15 @@ public class StudentsAdapter
    }
 
    /**
-    * 通知该适配器情况发生变化（学生列表、排序方式和过滤条件中其一或其中多个发生变化）
+    * 通知该适配器数据发生变化（学生列表、排序方式和过滤条件中其一或其中多个发生变化）。
+    * 该方法会异步执行数据更新。{@code listener}数据更新完成后，该监听器会被调用
     */
-   public void notifyConditionChanged() {
+   public void notifyDataChanged(OperationDoneListener listener) {
       executorService.submit(() -> {
          doFilterAndSort();
          activity.runOnUiThread(() -> {
             notifyDataSetChanged();
+            listener.onDone();
          });
       });
    }
@@ -103,15 +105,22 @@ public class StudentsAdapter
    @NonNull
    @Override
    public StudentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      SimpleListItemBinding bd = DataBindingUtil.inflate(
-         layoutInflater, R.layout.simple_list_item,
-         parent, false);
+      SimpleListItemBinding bd = DataBindingUtil.inflate(layoutInflater,
+         R.layout.simple_list_item, parent, false);
       return new StudentViewHolder(bd);
    }
 
    @Override
    public int getItemCount() {
       return filteredStudents.size();
+   }
+
+   public Student getFilteredStudent(int position) {
+      int size = filteredStudents.size();
+      if (position < 0 || position >= size) {
+         return null;
+      }
+      return filteredStudents.get(position);
    }
 
    @Override
@@ -129,10 +138,6 @@ public class StudentsAdapter
       });
    }
 
-   public interface ViewOnClickListener {
-      void onClick(Student student, int position);
-   }
-
    public static class StudentViewHolder extends RecyclerView.ViewHolder {
       private final SimpleListItemBinding bd;
 
@@ -140,6 +145,14 @@ public class StudentsAdapter
          super(bd.getRoot());
          this.bd = bd;
       }
+   }
+
+   public interface ViewOnClickListener {
+      void onClick(Student student, int position);
+   }
+
+   public interface OperationDoneListener {
+      void onDone();
    }
 
 }

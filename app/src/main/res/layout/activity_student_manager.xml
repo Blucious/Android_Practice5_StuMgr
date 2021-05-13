@@ -26,7 +26,7 @@
         android:iconifiedByDefault="false"
         android:padding="6dp"
         android:paddingHorizontal="12dp"
-        android:queryHint="搜索学生" />
+        android:queryHint="搜索学生，可全/首拼" />
 
       <View style="@style/sep_h" />
 
