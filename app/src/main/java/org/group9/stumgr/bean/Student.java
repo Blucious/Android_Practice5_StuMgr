@@ -40,6 +40,19 @@ public class Student implements Serializable {
       this.phoneNumber = phoneNumber;
    }
 
+   public Student setDefault() {
+      nmAttendanceScore = 0;
+      nmSpeakingScore = 0;
+      nmDemonstrationScore = 0;
+      nmAnswerScore = 0;
+
+      etProjectScore = 0;
+      etDemonstrationScore = 0;
+      etAnswerScore = 0;
+
+      return this;
+   }
+
    // ---------------- 辅助方法 开始 ----------------
    public double roundScore(double score) {
       return Precision.round(score, 2);

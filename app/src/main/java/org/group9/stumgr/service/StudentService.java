@@ -2,14 +2,13 @@ package org.group9.stumgr.service;
 
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 
 import org.group9.stumgr.bean.Student;
-import org.group9.stumgr.bean.StudentCriteria;
+import org.group9.stumgr.bean.AbstractStudentCriteria;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,13 +38,11 @@ public class StudentService {
       return Arrays.asList(students);
    }
 
-   public static List<Student> getRandomStudentsAsList(Resources resources,
-                                                       int n) {
+   public static List<Student> getRandomStudentsAsList(int n) {
       if (n < 0) {
          n = 0;
       }
-      StudentGenerator gen = StudentGenerator.getInstance(resources);
-      return gen.genStudentsList(n);
+      return StudentGenerator.genStudentList(n);
    }
 
    /**
@@ -117,7 +114,7 @@ public class StudentService {
     * @return 根据 {@code criteria} 过滤后的学生的列表
     */
    public static List<Student> filter(List<Student> students,
-                                      StudentCriteria criteria) {
+                                      AbstractStudentCriteria criteria) {
       // 长度不确定的情况LinkedList未必会比ArrayList更快，有稍微测试过。
       // 可能是因为频繁申请内存，或内存碎片的原因。
       List<Student> filtered = new ArrayList<>();

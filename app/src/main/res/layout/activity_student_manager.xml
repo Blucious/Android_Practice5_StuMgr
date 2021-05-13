@@ -49,7 +49,7 @@
 
       <fragment
         android:id="@+id/stuInfoFragment"
-        android:name="org.group9.stumgr.ui.StudentFragment"
+        android:name="org.group9.stumgr.ui.StudentInfoFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.75" />

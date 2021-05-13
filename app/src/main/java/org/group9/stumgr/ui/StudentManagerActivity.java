@@ -33,15 +33,16 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.List;
 
-public class StudentActivity extends AppCompatActivity {
-   private static final String TAG = StudentActivity.class.getSimpleName();
+public class StudentManagerActivity extends AppCompatActivity {
+   private static final String TAG = StudentManagerActivity.class.getSimpleName();
 
 
    private List<Student> students;
 
    private ActivityStudentManagerBinding bd;
    private RecyclerView studentsRecyclerView;
-   private StudentsAdapter studentsAdapter;
+   private StudentListAdapter studentListAdapter;
+
 
    @Override
    protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,9 +57,10 @@ public class StudentActivity extends AppCompatActivity {
    }
 
    private void initData() {
-      setStudentsSafely(
-         StudentService.getRandomStudentsAsList(getResources(), 25)
+      setStudentsAndSyncToAdapter(
+         StudentService.getRandomStudentsAsList(25)
       );
+
    }
 
    private void initView() {
@@ -72,22 +74,14 @@ public class StudentActivity extends AppCompatActivity {
 
          @Override
          public boolean onQueryTextChange(String newText) {
-            String nameFragment = newText != null ? newText : "";
-            studentsAdapter.getStudentCriteria().setNameFragment(nameFragment);
-            notifyConditionChanged();
+            studentListAdapter.getStudentCriteria().setNameFragment(newText);
+            studentListAdapter.notifyDataChanged();
             return true;
          }
       });
 
       // 学生列表相关
       {
-         studentsAdapter = new StudentsAdapter(this, students, new StudentsAdapter.ViewOnClickListener() {
-            @Override
-            public void onClick(Student student, int position) {
-               displayStudent(student);
-            }
-         });
-
          // DataBinding找不到这个id，原因不明。故手动findViewById
          studentsRecyclerView = bd.getRoot().findViewById(R.id.studentRecyclerView);
 
@@ -98,79 +92,85 @@ public class StudentActivity extends AppCompatActivity {
             studentsRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
          studentsRecyclerView.addItemDecoration(did);
 
-         studentsRecyclerView.setAdapter(studentsAdapter);
+         // 适配器
+         studentListAdapter = new StudentListAdapter(this, students,
+            new StudentListAdapter.ViewItemOnClickListener() {
+               @Override
+               public void onClick(Student student, int position) {
+                  displayStudent(student);
+               }
+            },
+            new StudentListAdapter.DataUpdatingFinishedListener() {
+               @Override
+               public void onFinished() {
+                  // 将列表滚动到顶部，从头开始展示更新后的内容
+                  studentsRecyclerView.scrollToPosition(0);
 
-         notifyConditionChanged();
+                  // 显示第一个学生的信息
+                  displayFirstStudent();
+               }
+            });
+         studentsRecyclerView.setAdapter(studentListAdapter);
+
       }
 
    }
 
-   private void setStudentsSafely(List<Student> students) {
+   /**
+    * 设置学生列表，不会进行关联数据的更新
+    */
+   private void setStudentsAndSyncToAdapter(@Nullable List<Student> students) {
       if (students == null) {
          students = Collections.emptyList();
       }
       this.students = students;
-      if (studentsAdapter != null) {
-         studentsAdapter.setStudents(students);
+      if (studentListAdapter != null) {
+         studentListAdapter.setStudents(students);
       }
    }
 
    /**
-    * 通知学生过滤条件或排序方式其一或多者发生变化。
+    * 展示{@code studentListAdapter}中过滤后的学生列表中的第一个学生
     */
-   private void notifyConditionChanged() {
-
-      studentsAdapter.notifyDataChanged(new StudentsAdapter.OperationDoneListener() {
-         @Override
-         public void onDone() {
-            // 将列表滚动到顶部，从头开始展示更新后的内容
-            studentsRecyclerView.scrollToPosition(0);
-
-            // 显示第一个学生的信息
-            Student student = studentsAdapter.getFilteredStudent(0);
-            displayStudent(student);
-         }
-      });
-
+   private void displayFirstStudent() {
+      Student student = studentListAdapter.getFilteredStudent(0);
+      displayStudent(student);
    }
 
    /**
-    * 在{@link StudentFragment}中展示指定学生
+    * 在{@link StudentInfoFragment}中展示指定学生
     */
-   private void displayStudent(Student stu) {
-      if (stu == null) {
-         return;
-      }
+   private void displayStudent(@Nullable Student stu) {
 
-      StudentFragment fragment = (StudentFragment) getSupportFragmentManager()
+      StudentInfoFragment fragment = (StudentInfoFragment) getSupportFragmentManager()
          .findFragmentById(R.id.stuInfoFragment);
 
       fragment.setStudent(stu);
    }
 
-   /*
-    * 获取文件选择器返回值 将json转化为java对象
-    **/
+   /* ---------------- Activity返回值处理相关 开始 ---------------- */
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
       if (requestCode == UIConstants.REQ_CODE_GET_CONTENT) {
+         // 获取文件选择器返回值 将json转化为java对象
          if (resultCode == Activity.RESULT_OK) { //是否选择，没选择就不会继续
             Uri data1 = data.getData();
-            File file = new File(FileUtils.getFilePathByUri(StudentActivity.this, data1));
+            File file = new File(FileUtils.getFilePathByUri(StudentManagerActivity.this, data1));
 //          File file = UriToFile.trans(StudentActivity.this,data1);
             List<Student> newStudents = StudentService.importStuInfoByJson(file);
-            // 导入后重新刷新列表
-            setStudentsSafely(newStudents);
-            notifyConditionChanged();
+            // 导入后刷新列表
+            setStudentsAndSyncToAdapter(newStudents);
+            studentListAdapter.notifyDataChanged();
 
-            Toast.makeText(StudentActivity.this,
+            Toast.makeText(StudentManagerActivity.this,
                "成功导入" + newStudents.size() + "条数据", Toast.LENGTH_LONG).show();
          }
       } else {
          super.onActivityResult(requestCode, resultCode, data);
       }
    }
+   /* ---------------- Activity返回值处理相关 结束 ---------------- */
 
 
    /* ---------------- 菜单相关 开始 ---------------- */
@@ -208,17 +208,17 @@ public class StudentActivity extends AppCompatActivity {
 
    public void onSortingOptionSelected(@NonNull MenuItem item) {
 
-      final int prevSortingTypeIndex = studentsAdapter.getSortingTypeIndex();
+      final int prevSortingTypeIndex = studentListAdapter.getSortingTypeIndex();
 
       AlertDialog alertDialog = new AlertDialog.Builder(this)
          .setIcon(R.drawable.ic_baseline_sort_30_dark)
          .setTitle("排序方式")
          .setSingleChoiceItems(StudentService.SORTING_METHOD_NAMES, prevSortingTypeIndex,
-            (dialog, which) -> studentsAdapter.setSortingTypeIndex(which))
+            (dialog, which) -> studentListAdapter.setSortingTypeIndex(which))
          .setPositiveButton("关闭", (dialog, which) -> dialog.dismiss())
          .setOnDismissListener(dialog -> {
-            if (prevSortingTypeIndex != studentsAdapter.getSortingTypeIndex()) {
-               notifyConditionChanged();
+            if (prevSortingTypeIndex != studentListAdapter.getSortingTypeIndex()) {
+               studentListAdapter.notifyDataChanged();
             }
          })
          .create();
@@ -246,10 +246,10 @@ public class StudentActivity extends AppCompatActivity {
 
    public void onExportMOptionSelected() {
       try {
-         boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentActivity.this, this);
+         boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentManagerActivity.this, this);
 
-         String path = StudentService.exportStuInfoByJson(StudentActivity.this, students);
-         Toast.makeText(StudentActivity.this, "成功导出至" + path, Toast.LENGTH_LONG).show();
+         String path = StudentService.exportStuInfoByJson(StudentManagerActivity.this, students);
+         Toast.makeText(StudentManagerActivity.this, "成功导出至" + path, Toast.LENGTH_LONG).show();
          Log.d(TAG, "onOptionsItemSelected: " + path);
 
 
@@ -259,7 +259,7 @@ public class StudentActivity extends AppCompatActivity {
    }
 
    public void onImportMOptionSelected() {
-      boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentActivity.this, this);
+      boolean PermissionResult = new PermissionManager().build().RequestPermission(StudentManagerActivity.this, this);
 
       Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
       intent.setType("*/*");

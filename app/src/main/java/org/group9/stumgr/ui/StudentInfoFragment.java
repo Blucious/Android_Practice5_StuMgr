@@ -15,7 +15,7 @@ import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.databinding.FragmentStudentInfoBinding;
 
 
-public class StudentFragment extends Fragment {
+public class StudentInfoFragment extends Fragment {
 
    private FragmentStudentInfoBinding bd;
 
@@ -31,8 +31,12 @@ public class StudentFragment extends Fragment {
       return bd.getRoot();
    }
 
-   public void setStudent(Student student) {
-      bd.setStudent(student);
+   public void setStudent(@Nullable Student student) {
+      if (student == null) {
+         bd.setStudent(new Student().setDefault());
+      } else {
+         bd.setStudent(student);
+      }
    }
 
 

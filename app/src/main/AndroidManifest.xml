@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.group9.stumgr">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="org.group9.stumgr">
+
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-      tools:ignore="ScopedStorage" />
-  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-      tools:ignore="ScopedStorage" />
+  <uses-permission
+    android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    tools:ignore="ScopedStorage" />
+  <uses-permission
+    android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    tools:ignore="ScopedStorage" />
+
   <application
+    android:name=".context.G9StuMgrApplication"
     android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
+    android:requestLegacyExternalStorage="true"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/Theme.Practice5_StuMgr"
-      android:requestLegacyExternalStorage="true">
-    <activity android:name=".ui.StudentActivity">
+    android:theme="@style/Theme.Practice5_StuMgr">
+    <activity android:name=".ui.StudentManagerActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 

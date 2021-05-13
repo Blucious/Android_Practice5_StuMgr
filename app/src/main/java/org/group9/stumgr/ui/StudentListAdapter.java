@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.group9.stumgr.R;
-import org.group9.stumgr.bean.SimpleStudentCriteria;
+import org.group9.stumgr.bean.StudentCriteria;
 import org.group9.stumgr.bean.Student;
 import org.group9.stumgr.databinding.SimpleListItemBinding;
 import org.group9.stumgr.service.StudentService;
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class StudentsAdapter
-   extends RecyclerView.Adapter<StudentsAdapter.StudentViewHolder> {
+public class StudentListAdapter
+   extends RecyclerView.Adapter<StudentListAdapter.StudentViewHolder> {
 
    private final Activity activity;
    private final LayoutInflater layoutInflater;
@@ -29,31 +29,35 @@ public class StudentsAdapter
    /**
     * {@code students}：外部传入的完整的学生列表
     * {@code filteredStudents}：根据{@code studentCriteria}过滤、
-    *   根据{@code sortingTypeIndex}排序后的学生列表
+    * 根据{@code sortingTypeIndex}排序后的学生列表
     */
    private List<Student> students = Collections.emptyList();
    private List<Student> filteredStudents = Collections.emptyList();
-   private SimpleStudentCriteria studentCriteria = new SimpleStudentCriteria();
+   private StudentCriteria studentCriteria = new StudentCriteria();
    private int sortingTypeIndex = 0;
 
    /**
     * 保存外部传入的监听器
     */
-   private ViewOnClickListener listener;
+   private ViewItemOnClickListener viewItemOnClickListener;
+   private DataUpdatingFinishedListener dataUpdatingFinishedListener;
 
    /**
     * 创建一个只有一个线程的线程池，来执行过滤和排序等操作。
     * 以避免在UI线程进行重计算操作。
     */
-   private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+   private final ExecutorService executorService =
+      Executors.newFixedThreadPool(1);
 
-   public StudentsAdapter(Activity activity, List<Student> students,
-                          ViewOnClickListener listener) {
+   public StudentListAdapter(Activity activity, List<Student> students,
+                             ViewItemOnClickListener viewItemOnClickListener,
+                             DataUpdatingFinishedListener dataUpdatingFinishedListener) {
       this.activity = activity;
       layoutInflater = activity.getLayoutInflater();
+      this.viewItemOnClickListener = viewItemOnClickListener;
+      this.dataUpdatingFinishedListener = dataUpdatingFinishedListener;
       setStudents(students);
-      doFilterAndSort();
-      this.listener = listener;
+      notifyDataChanged();
    }
 
    public int getSortingTypeIndex() {
@@ -64,13 +68,13 @@ public class StudentsAdapter
       this.sortingTypeIndex = sortingTypeIndex;
    }
 
-   public SimpleStudentCriteria getStudentCriteria() {
+   public StudentCriteria getStudentCriteria() {
       return studentCriteria;
    }
 
-   public void setStudentCriteria(SimpleStudentCriteria studentCriteria) {
+   public void setStudentCriteria(StudentCriteria studentCriteria) {
       if (studentCriteria == null) {
-         studentCriteria = new SimpleStudentCriteria();
+         studentCriteria = new StudentCriteria();
       }
       this.studentCriteria = studentCriteria;
    }
@@ -80,20 +84,24 @@ public class StudentsAdapter
          students = Collections.emptyList();
       }
       this.students = students;
-      // 清除为旧学生列表所建立的缓存
+      // 清除之前学生名拼音的缓存
       studentCriteria.clearPinyinCache();
    }
 
    /**
     * 通知该适配器数据发生变化（学生列表、排序方式和过滤条件中其一或其中多个发生变化）。
-    * 该方法会异步执行数据更新。{@code listener}数据更新完成后，该监听器会被调用
+    * 该方法会异步执行数据更新。
     */
-   public void notifyDataChanged(OperationDoneListener listener) {
+   public void notifyDataChanged() {
       executorService.submit(() -> {
+
          doFilterAndSort();
+
          activity.runOnUiThread(() -> {
             notifyDataSetChanged();
-            listener.onDone();
+            if (dataUpdatingFinishedListener != null) {
+               dataUpdatingFinishedListener.onFinished();
+            }
          });
       });
    }
@@ -126,14 +134,14 @@ public class StudentsAdapter
 
    @Override
    public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
-      Student stu = filteredStudents.get(position);
+      final Student stu = filteredStudents.get(position);
 
       holder.bd.textView.setText(stu.getName());
       holder.bd.getRoot().setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-            if (listener != null) {
-               listener.onClick(stu, position);
+            if (viewItemOnClickListener != null) {
+               viewItemOnClickListener.onClick(stu, position);
             }
          }
       });
@@ -148,12 +156,12 @@ public class StudentsAdapter
       }
    }
 
-   public interface ViewOnClickListener {
+   public interface ViewItemOnClickListener {
       void onClick(Student student, int position);
    }
 
-   public interface OperationDoneListener {
-      void onDone();
+   public interface DataUpdatingFinishedListener {
+      void onFinished();
    }
 
 }

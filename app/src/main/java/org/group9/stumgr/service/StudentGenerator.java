@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.group9.stumgr.R;
 import org.group9.stumgr.bean.Student;
+import org.group9.stumgr.context.G9StuMgrApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,21 +22,17 @@ import java.util.stream.Collectors;
 public class StudentGenerator {
    private static final String TAG = StudentGenerator.class.getSimpleName();
 
-   private static StudentGenerator instance;
-   private static List<String> names = Collections.emptyList();
+   private static List<String> names;
 
-   private StudentGenerator() {
-   }
-
-   public static synchronized StudentGenerator getInstance(Resources resources) {
-      if (instance == null) {
-         loadNamesList(resources);
-         instance = new StudentGenerator();
+   public static String genName() {
+      if (names == null) {
+         loadNameList(G9StuMgrApplication.getInstance().getResources());
       }
-      return instance;
+      int index = (int) (Math.random() * names.size());
+      return names.get(index);
    }
 
-   public static void loadNamesList(Resources resources) {
+   private static void loadNameList(Resources resources) {
       try {
          InputStream is = resources.openRawResource(R.raw.person_names);
          List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
@@ -44,15 +41,12 @@ public class StudentGenerator {
             .collect(Collectors.toList());
       } catch (IOException e) {
          Log.e(TAG, "loadNamesList: ", e);
+
+         names = Collections.singletonList("Test");
       }
    }
 
-   public String genName() {
-      int index = (int) (Math.random() * names.size());
-      return names.get(index);
-   }
-
-   public String genPhoneNumber() {
+   public static String genPhoneNumber() {
       StringBuilder sb = new StringBuilder(11);
       sb.append('1');
       for (int i = 0; i < 10; i++) {
@@ -62,12 +56,12 @@ public class StudentGenerator {
    }
 
    @SuppressLint("DefaultLocale")
-   public String genAddress() {
+   public static String genAddress() {
       return String.format("湖北省武汉市洪山区 %d 号",
          (1 + (int) (Math.random() * 10000)));
    }
 
-   public Student genStudent() {
+   public static Student genStudent() {
       Student stu = new Student();
       // 个人信息
       stu.setName(genName());
@@ -86,7 +80,7 @@ public class StudentGenerator {
       return stu;
    }
 
-   public List<Student> genStudentsList(int n) {
+   public static List<Student> genStudentList(int n) {
 
       ArrayList<Student> l = new ArrayList<>(n);
       for (int i = 0; i < n; i++) {
@@ -96,7 +90,7 @@ public class StudentGenerator {
       return l;
    }
 
-   public int randInt(int start, int end) {
+   public static int randInt(int start, int end) {
       if (start == end) {
          return start;
       } else {
@@ -104,7 +98,7 @@ public class StudentGenerator {
       }
    }
 
-   public void setScores(Student stu, IntSupplier supplier) {
+   public static void setScores(Student stu, IntSupplier supplier) {
       stu.setEtAnswerScore(supplier.getAsInt());
       stu.setEtDemonstrationScore(supplier.getAsInt());
       stu.setEtProjectScore(supplier.getAsInt());
