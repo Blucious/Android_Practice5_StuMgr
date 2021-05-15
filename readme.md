@@ -1,4 +1,3 @@
-<video id="video" controls="" preload="none">
-      <source id="mp4" src="demo.mp4" type="video/mp4">
-      <p>Your user agent does not support the HTML5 Video element.</p>
-</video>
+
+https://user-images.githubusercontent.com/23415223/118351183-0000ca00-b58d-11eb-904a-9fb028404847.mp4
+
